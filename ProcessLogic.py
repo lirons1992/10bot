@@ -55,8 +55,10 @@ class ProcessLogic(Processor):
         elif not self.holidays_db.is_working_day():
             self.logger.info('today is %s, skipping purchase', self.holidays_db.get_holiday_data()['eng_name'])
         elif self.ten_bis.is_budget_available():
+            available_balance = self.ten_bis.get_available_balance()  # Get available balance
             self.logger.info('Budget available, purchasing.')
-            self.ten_bis.buy_coupon(40)
+            self.logger.info(f'Available Balance: {available_balance}')
+            self.ten_bis.buy_coupon(available_balance)
             send_report = True
         else:
             self.logger.info('No Budget, Purchase will be skipped ')

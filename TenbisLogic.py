@@ -160,20 +160,35 @@ class Tenbis:
         payload = {"culture": "he-IL", "uiCulture": "he", "dateBias": 0}
         report = self.post_next_api('UserTransactionsReport', payload)
 
+        # option3 - check if balance for today > 0
+        daily_balance = report['Data']['moneycards'][0]['tenbisCreditConversion']['availableAmount']
+        if daily_balance > 0:
+            self.logger.debug('Today balance is:%s', daily_balance)
+            return True
+
         # option1 - check the last order, and check
-        last_order_is_today = False if len(report['Data']['orderList']) == 0 else (
-                report['Data']['orderList'][-1]['orderDateStr'] == datetime.today().strftime("%d.%m.%y"))
-        if last_order_is_today:
-            self.logger.debug('last_order_check:%s', last_order_is_today)
-            return False
+        #last_order_is_today = False if len(report['Data']['orderList']) == 0 else (
+         #       report['Data']['orderList'][-1]['orderDateStr'] == datetime.today().strftime("%d.%m.%y"))
+        #if last_order_is_today:
+         #   self.logger.debug('last_order_check:%s', last_order_is_today)
+          #  return False
 
-        # check if usage for today > 0
-        daily_usage = report['Data']['moneycards'][0]['usage']['daily']
-        if daily_usage > 0:
-            self.logger.debug('Today usage is:%s', daily_usage)
-            return False
+        # option2- check if usage for today > 0
+        #daily_usage = report['Data']['moneycards'][0]['usage']['daily']
+        #if daily_usage > 0:
+         #   self.logger.debug('Today usage is:%s', daily_usage)
+          #  return False
 
-        return True
+        return False
+    
+    def get_available_balance(self):
+        payload = {"culture": "he-IL", "uiCulture": "he", "dateBias": 0}
+        report = self.post_next_api('UserTransactionsReport', payload)
+        
+        # Extract the available balance from the 'report' data
+        amount = report['Data']['moneycards'][0]['tenbisCreditConversion']['availableAmount']  # Accessing the first moneycard
+
+        return amount
 
     def buy_coupon(self, coupon):
         """
@@ -205,12 +220,12 @@ class Tenbis:
 
         # SetRestaurantInOrder
         payload = {"shoppingCartGuid": self.cart_guid, "culture": "he-IL", "uiCulture": "he", "isMobileDevice": True,
-                   "restaurantId": "26698"}
+                   "restaurantId": "40066"}
         self.post_next_api('SetRestaurantInOrder', payload)
 
         # SetDishListInShoppingCart
         payload = {"shoppingCartGuid": self.cart_guid, "culture": "he-IL", "uiCulture": "he",
-                   "dishList": [{"dishId": COUPONS_IDS[coupon], "shoppingCartDishId": 1, "quantity": 1,
+                   "dishList": [{"dishId": coupon, "shoppingCartDishId": 1, "quantity": 1,
                                  "assignedUserId": self.user_id, "choices": [], "dishNotes": None,
                                  "categoryId": 278344}]}
         self.post_next_api('SetDishListInShoppingCart', payload)
