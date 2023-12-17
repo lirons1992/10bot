@@ -215,7 +215,7 @@ class Tenbis:
 
         # SetDeliveryMethodInOrder
         payload = {"shoppingCartGuid": self.cart_guid, "culture": "he-IL", "uiCulture": "he",
-                   "deliveryMethod": "delivery"}
+                   "deliveryMethod": "pickup"}
         self.post_next_api('SetDeliveryMethodInOrder', payload)
 
         # SetRestaurantInOrder
